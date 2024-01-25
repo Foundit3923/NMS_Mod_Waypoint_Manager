@@ -78,7 +78,6 @@ def print_struct(struct: ctypes.Structure, max_depth=5):
             logging.info(" " * depth + f"{name}:{attr}")
 
 class waypoint_manager(NMSMod):
-
     __author__ = "foundit"
     __description__ = "Place markers at stored waypoints of places you've been"
     __version__ = "0.1"
@@ -103,12 +102,11 @@ class waypoint_manager(NMSMod):
     def checkSetMarker(self, this):
         try:
             logging.info("Binoc SetMarker event triggered")
-            logging.info(f'memutils: ')
-            logging.info(memutils.pprint_mem(this + 2000, 0x10))
-            logging.info(f'print_struct(mpDiscoveryGui): ')
+            logging.info(f'memutils: ' + memutils.pprint_mem(this + 2000, 0x10))
             logging.info(f'binocs: '+str(self.state.binoculars))
-            logging.info(f'this:   ' + str(this))
+            logging.info(f'this(cGcBinoculars):   ' + str(this))
             logging.info(f'print_struct(MarkerModel.lookupInt): ')
+            print_struct(str(self.state.binoculars.MarkerModel.lookupInt))
             self.lookupInt = 0
             self.lookupInt = self.state.binoculars.MarkerModel.lookupInt   
             logging.info(str(self.lookupInt))
@@ -120,7 +118,7 @@ class waypoint_manager(NMSMod):
         try:
             logging.info(f'Output')
             logging.info(ctypes.addressof(nms.GcApplication.data.contents.Simulation) - ctypes.addressof(nms.GcApplication.data.contents))
-            logging.info(f'Pressed tic: ')
+            logging.info(f'Pressed o: ')
             position = self.state.playerEnv.mPlayerTM
             position_matrix = position.matrix
             position_matrix_string = ','.join(str(item) for item in position_matrix)
@@ -133,7 +131,7 @@ class waypoint_manager(NMSMod):
 
     @hooking.on_key_pressed("space")
     def place_marker(self):
-        logging.info(f'this isn\'t possible')
+        logging.info(f'Place marker with code')
         try:
             address = ctypes.addressof(self.state.binoculars)
             logging.info(f'ctypes.addressof(self.state.binoculars): ' + str(address))
@@ -152,9 +150,11 @@ class waypoint_manager(NMSMod):
         self.state.binoculars = map_struct(sim_addr + 74160 + 6624, nms_structs.cGcBinoculars)
 
     @hooking.on_key_pressed("i")
-    def press(self):
+    def move_marker(self):
         try:
-            logging.info(f'Pressed P, moving marker: ')
+            logging.info(f'test test test')
+            logging.info(f'Pressed I, moving marker: ')
+            logging.info(f'self.lookupInt: ' + str(self.lookupInt))
             vec = common.Vector3f(3,0,0) #this is not the location we want. This is how much we change each of these values
             call_function("Engine::ShiftAllTransformsForNode", self.lookupInt, ctypes.addressof(vec))
         except Exception as e:
