@@ -80,7 +80,7 @@ def print_struct(struct: ctypes.Structure, max_depth=5):
 class function_testing(NMSMod):
 
     __author__ = "foundit"
-    __description__ = "fucking with the mod system"
+    __description__ = "Place markers at stored waypoints of places you've been"
     __version__ = "0.1"
     __NMSPY_required_version__ = "0.6.0"
 
@@ -116,7 +116,7 @@ class function_testing(NMSMod):
             logging.exception(e)
 
     @hooking.on_key_pressed("o")
-    def press(self):
+    def get_position(self):
         try:
             logging.info(f'Output')
             logging.info(ctypes.addressof(nms.GcApplication.data.contents.Simulation) - ctypes.addressof(nms.GcApplication.data.contents))
@@ -132,7 +132,7 @@ class function_testing(NMSMod):
             logging.exception(e)
 
     @hooking.on_key_pressed("space")
-    def press(self):
+    def place_marker(self):
         logging.info(f'this isn\'t possible')
         try:
             address = ctypes.addressof(self.state.binoculars)
