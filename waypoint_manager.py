@@ -77,7 +77,7 @@ def print_struct(struct: ctypes.Structure, max_depth=5):
             attr = getattr(struct, name)
             logging.info(" " * depth + f"{name}:{attr}")
 
-class function_testing(NMSMod):
+class waypoint_manager(NMSMod):
 
     __author__ = "foundit"
     __description__ = "Place markers at stored waypoints of places you've been"
@@ -106,12 +106,12 @@ class function_testing(NMSMod):
             logging.info(f'memutils: ')
             logging.info(memutils.pprint_mem(this + 2000, 0x10))
             logging.info(f'print_struct(mpDiscoveryGui): ')
-            logging.info(f'print_struct(MarkerModel.lookupInt): ')
-            self.lookupInt = self.binoculars.MarkerModel.lookupInt
-            sim_addr = ctypes.addressof(nms.GcApplication.data.contents.Simulation)
-            binocs = sim_addr + 74160 + 0 + 6624           
             logging.info(f'binocs: '+str(self.state.binoculars))
             logging.info(f'this:   ' + str(this))
+            logging.info(f'print_struct(MarkerModel.lookupInt): ')
+            self.lookupInt = 0
+            self.lookupInt = self.state.binoculars.MarkerModel.lookupInt   
+            logging.info(str(self.lookupInt))
         except Exception as e:
             logging.exception(e)
 
@@ -151,12 +151,12 @@ class function_testing(NMSMod):
         sim_addr = ctypes.addressof(nms.GcApplication.data.contents.Simulation)
         self.state.binoculars = map_struct(sim_addr + 74160 + 6624, nms_structs.cGcBinoculars)
 
-    #@hooking.on_key_pressed("alt")
-    #def press(self):
-    #    try:
-    #        logging.info(f'Pressed Space, moving marker: ')
-    #        vec = common.Vector3f(3,0,0) #this is not the location we want. This is how much we change each of these values
-    #        call_function("Engine::ShiftAllTransformsForNode", self.lookupInt, ctypes.addressof(vec))
-    #    except Exception as e:
-    #        logging.exception(e)
+    @hooking.on_key_pressed("i")
+    def press(self):
+        try:
+            logging.info(f'Pressed P, moving marker: ')
+            vec = common.Vector3f(3,0,0) #this is not the location we want. This is how much we change each of these values
+            call_function("Engine::ShiftAllTransformsForNode", self.lookupInt, ctypes.addressof(vec))
+        except Exception as e:
+            logging.exception(e)
 
