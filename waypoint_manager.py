@@ -46,12 +46,10 @@ from dataclasses import dataclass
                 if hasattr(struct, field_name[1:]):
                     logging.info("  " * depth + f"{field_name}: {getattr(struct, field_name[1:])}") """
 
-@dataclass
 class State_Vars(ModState):
-    def __init__(self, binoc_arg, pEnv_arg):
+    def __init__(self, binoc_arg=None, pEnv_arg=None):
         self.binoculars: binoc_arg
         self.playerEnv: pEnv_arg
-
 
 def print_struct(struct: ctypes.Structure, max_depth=5):
     depth = 0
@@ -83,10 +81,7 @@ class waypoint_manager(NMSMod):
     __version__ = "0.1"
     __NMSPY_required_version__ = "0.6.0"
 
-    state = State_Vars(         
-        ctypes.Structure,
-        ctypes.Structure,
-    )
+    state = State_Vars()
 
     def __init__(self):
         super().__init__()
