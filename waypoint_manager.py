@@ -101,10 +101,10 @@ class waypoint_manager(NMSMod):
             logging.info(f'binocs: '+str(self.state.binoculars))
             logging.info(f'this(cGcBinoculars):   ' + str(this))
             logging.info(f'print_struct(MarkerModel.lookupInt): ')
-            print_struct(str(self.state.binoculars.MarkerModel.lookupInt))
+            print_struct(str(self.state.binoculars.MarkerModel))
             self.lookupInt = 0
             self.lookupInt = self.state.binoculars.MarkerModel.lookupInt   
-            logging.info(str(self.lookupInt))
+            logging.info(f'self.lookupInt: ' + str(self.lookupInt))
         except Exception as e:
             logging.exception(e)
 
@@ -127,11 +127,22 @@ class waypoint_manager(NMSMod):
     @hooking.on_key_pressed("space")
     def place_marker(self):
         logging.info(f'Place marker with code')
+        #can't consistently place markers
+        #was considerably more easy after dying
+        #all markers now have the same lookupInt and address
+        #only the binocular placed marker moves when 'i' is pressed
+        #when each new marker is placed the last one glows
+        #this mirrors how the binocular placed markers act when a new one is place
+        #the only difference is that with binocular placed markers the old one goes away when it glows
+        #the code placed ones do not
+        #Seems that code placed markers are not stored correctly
         try:
             address = ctypes.addressof(self.state.binoculars)
             logging.info(f'ctypes.addressof(self.state.binoculars): ' + str(address))
             offset = ctypes.addressof(self.state.binoculars)
+            logging.info(f'binoculars offset: ' + str(offset))
             ptr = ctypes.c_ulonglong(offset)
+            logging.info(f'binoculars ptr: ' + str(ptr))
             call_function("cGcBinoculars::SetMarker", ctypes.addressof(ptr))
         except Exception as e:
             logging.exception(e)
@@ -152,6 +163,16 @@ class waypoint_manager(NMSMod):
             logging.info(f'self.lookupInt: ' + str(self.lookupInt))
             vec = common.Vector3f(3,0,0) #this is not the location we want. This is how much we change each of these values
             call_function("Engine::ShiftAllTransformsForNode", self.lookupInt, ctypes.addressof(vec))
+        except Exception as e:
+            logging.exception(e)
+
+    @hooking.on_key_pressed("l")
+    def clear_binocular_var(self):
+        try:
+            logging.info(f'reseting self.state.binoculars')
+            self.state.binoculars = None
+            sim_addr = ctypes.addressof(nms.GcApplication.data.contents.Simulation)
+            self.state.binoculars = map_struct(sim_addr + 74160 + 6624, nms_structs.cGcBinoculars)           
         except Exception as e:
             logging.exception(e)
 
